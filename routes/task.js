@@ -30,7 +30,7 @@ var router = express.Router();
 //     res.send(result.toString());
 // });
 
-router.get('/', function(req, res, next) {
+/*router.get('/', function(req, res, next) {
     var lastName, firstName, patroName, result;
     var fullname = req.query.fullname;
     var reg = /\d/;
@@ -64,8 +64,28 @@ router.get('/', function(req, res, next) {
         }
         res.send(result);
     }
+});
+*/
 
+router.get('/', function(req, res, next) {
+    var username = req.query.username;
+    var subUser = '';
+
+    if(username){
+        if (username.match(/@\w+/g)){
+            subUser = username.match(/@\w+/g)[0];
+        } else {
+            if (username.lastIndexOf("/") != -1) {
+                subUser = '@'+ username.match( /\w+\w+.\w+\/\w+.+/g )[0].split('/')[1];
+            } else {
+                subUser = '@'+ username.match( /\w+/g )[0];
+            }
+        }
+        res.send(subUser);
+
+    } else {
+        res.send('Invalid username');
+    }
 
 });
-
 module.exports = router;
