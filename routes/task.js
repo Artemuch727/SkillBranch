@@ -106,7 +106,7 @@ let pc = {"board":{"vendor":"IBM","model":"IBM-PC S-100","cpu":{"model":"80286",
     .catch(err => {
         console.log('Чтото пошло не так:', err);
     });*/
-
+/*
 router.get('/volumes', function (req,res,next) {
     function getSum(letter, arr){
         let res = 0;
@@ -182,6 +182,91 @@ router.get('/*', function(req, res, next) {
          }
 
      });
+*/
 
+router.get('/', function (req,res,next){
+
+    function hexTo(rgb) {
+
+        function hex(x) {
+
+                return !isNaN(parseInt(x, 16)) && parseInt(x, 16) <= 255 ? x.toString().toLocaleLowerCase() : false;
+        }
+
+        let rgFull = [];
+        let result = '';
+        let rg = rgb.split('');
+        if (rg[0] == '#'){
+            rg.shift();
+        }
+        if (rg.length > 6) {
+            result = 'Invalid color';
+        } else {
+            if (rg.length == 3) {
+                rg = rg.forEach(item => {
+                    rgFull.push(item);
+                    rgFull.push(item);
+                });
+            }
+            if (rgFull.length == 0) {
+                rgFull = rg;
+            }
+            if (hex(rgFull[0]+rgFull[1]) && hex(rgFull[2]+rgFull[3]) && hex(rgFull[4]+rgFull[5])){
+                result = '#' + hex(rgFull[0]+rgFull[1]) + hex(rgFull[2]+rgFull[3]) + hex(rgFull[4]+rgFull[5]);
+            } else {
+                result = 'Invalid color';
+            }
+
+        }
+
+        return  result;
+    }
+
+    function rgb2hex(rgb) {
+        if (  rgb.search("rgb") == -1 ) {
+            return rgb;
+        }
+        else if ( rgb == 'rgba(0, 0, 0, 0)' ) {
+            return 'transparent';
+        }
+        else {
+            rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+            function hex(x) {
+                return ("0" + parseInt(x).toString(16)).slice(-2);
+            }
+            if (rgb !== null && rgb[rgb.length-1] == undefined){
+                if (rgb[1] <= 255 && rgb[2] <= 255 && rgb[3] <= 255 ){
+                    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+                }else {
+                    return 'Invalid color';
+                }
+            }else {
+                return 'Invalid color';
+            }
+
+        }
+    }
+
+
+    var result = '';
+    var color = req.query.color;
+    if (color){
+        if (color.indexOf("rgb") == -1){
+            var regEx = color.replace(/ /g,"").match(/[^A-Fa-f0-9#]/g);
+            if (regEx !== null){
+                result = 'Invalid color';
+            } else {
+                result = hexTo(color.replace(/ /g,""));
+            }
+        } else {
+            result = rgb2hex(color.replace(/ /g,""));
+        }
+
+    } else {
+        result = 'Invalid color';
+    }
+
+    res.send(result);
+});
 
 module.exports = router;
